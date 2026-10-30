@@ -15,20 +15,15 @@ public class ApiHistorialClinico {
         return s.consultarHistorial(idHistorial);
     }
 
-    @GetMapping("/consultarPorDni/{dni}")
-    public HistorialClinico consultarPorDni(@PathVariable String dni) { return s.consultarPorDni(dni); }
-
     @PostMapping("/grabar")
     public HistorialClinico grabar(@RequestBody HistorialClinico h) { return s.grabar(h); }
 
     @GetMapping("/listar")
     public List<HistorialClinico> listar() { return s.listar(); }
 
+    // Paciente: solo grabar y listar (no se busca; se consulta por el historial).
     @PostMapping("/paciente/grabar")
     public Paciente grabarPaciente(@RequestBody Paciente p) { return s.grabarPaciente(p); }
-
-    @GetMapping("/paciente/consultar/{dni}")
-    public Paciente consultarPaciente(@PathVariable String dni) { return s.consultarPaciente(dni); }
 
     @GetMapping("/paciente/listar")
     public List<Paciente> listarPacientes() { return s.listarPacientes(); }

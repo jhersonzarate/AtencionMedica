@@ -1,10 +1,12 @@
 package CentroMedico.MicroHistorialClinico;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
+@JsonPropertyOrder({"idHistorial", "fecCreacion", "dniPaciente"})
 public class HistorialClinico {
     @Id
     @GeneratedValue

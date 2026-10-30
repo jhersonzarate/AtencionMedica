@@ -1,10 +1,12 @@
 package CentroMedico.MicroCitaMedica;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
+@JsonPropertyOrder({"idCita", "fec", "motivo", "estado"})
 public class CitaMedica {
     @Id
     @GeneratedValue

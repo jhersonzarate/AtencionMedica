@@ -1,9 +1,11 @@
 package CentroMedico.MicroHistorialClinico;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
+@JsonPropertyOrder({"dni", "nom", "ape", "tel", "dir"})
 public class Paciente {
     @Id
     private String dni; // el DNI es el id del paciente

@@ -22,11 +22,6 @@ public class Servicio {
         return r.findById(idHistorial).orElse(null);
     }
 
-    // Consulta por DNI (el DNI es el id del paciente)
-    public HistorialClinico consultarPorDni(String dni) {
-        return r.findFirstByDniPaciente(dni).orElse(null);
-    }
-
     // Apoyo de pruebas: el paciente debe existir antes de crear su historial.
     public HistorialClinico grabar(HistorialClinico h) {
         if (h == null || h.getDniPaciente() == null || !h.getDniPaciente().matches("\\d{8}")) {
@@ -57,8 +52,8 @@ public class Servicio {
         return r.findAll();
     }
 
-    // ---- Paciente (solo NetBeans; no está en el diagrama) ----
-        public Paciente grabarPaciente(Paciente p) {
+    // ---- Paciente (apoyo; no está en el diagrama): solo grabar y listar ----
+    public Paciente grabarPaciente(Paciente p) {
         if (p == null || p.getDni() == null || !p.getDni().matches("\\d{8}")) {
             throw malo("El DNI debe tener 8 dígitos");
         }
@@ -79,10 +74,6 @@ public class Servicio {
         p.setTel(p.getTel().trim());
         p.setDir(p.getDir().trim());
         return rp.save(p);
-    }
-
-    public Paciente consultarPaciente(String dni) {
-        return rp.findById(dni).orElse(null);
     }
 
     public List<Paciente> listarPacientes() {
