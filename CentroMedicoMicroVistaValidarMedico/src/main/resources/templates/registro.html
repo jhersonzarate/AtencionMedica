@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrar médico · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body class="pantalla-registro">
+    <main class="principal">
+        <a class="volver" th:href="@{/ingreso}">&larr; Volver al ingreso</a>
+        <h2 class="titulo-grande">Registrar médico</h2>
+
+        <div class="aviso" role="alert" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/registro}" method="post" autocomplete="off">
+            <div class="campo mono">
+                <label class="etiqueta" for="nom">Nombre completo</label>
+                <input id="nom" name="nom" type="text" maxlength="100" th:value="${nom}" required autofocus>
+            </div>
+            <div class="campo mono">
+                <label class="etiqueta" for="especialidad">Especialidad</label>
+                <input id="especialidad" name="especialidad" type="text" maxlength="60" th:value="${especialidad}" required>
+            </div>
+            <div class="campo mono con-mostrar">
+                <label class="etiqueta" for="pass">Contraseña</label>
+                <input id="pass" name="pass" type="password" autocomplete="new-password" required>
+                <button type="button" class="mostrar" data-mostrar="pass">Mostrar</button>
+            </div>
+            <button class="boton serif" type="submit">Registrar médico</button>
+        </form>
+    </main>
+
+    <aside class="lateral">
+        <div class="regla">
+            <p class="etiqueta">Qué pasará</p>
+            <ol class="pasos">
+                <li><span>01</span><span>El sistema genera su código.</span></li>
+                <li><span>02</span><span>Anótelo.</span></li>
+                <li><span>03</span><span>Ingrese con ese código y su contraseña.</span></li>
+            </ol>
+        </div>
+    </aside>
+    <script th:src="@{/js/mostrar.js}"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Médico registrado · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body class="pantalla-listo">
+    <main class="listo">
+        <div class="regla">
+            <p class="etiqueta">Su código de ingreso</p>
+            <p class="codigo-grande" th:text="${codigo}">3</p>
+            <p class="detalle">Anote este código: lo necesitará para ingresar.</p>
+            <p class="detalle gris" th:text="${nom}">Nombre</p>
+            <a class="boton" th:href="@{/ingreso}">Ir a ingresar</a>
+        </div>
+    </main>
+</body>
+</html>

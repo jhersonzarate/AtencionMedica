@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inicio · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body class="pantalla-inicio">
+    <header class="barra">
+        <span class="barra-marca">Centro Médico</span>
+        <div class="barra-usuario">
+            <span><span th:text="${medico.nom()}">Médico</span> · código <span th:text="${medico.idMedico()}">0</span></span>
+            <form th:action="@{/salir}" method="post">
+                <button type="submit" class="boton-chico">Salir</button>
+            </form>
+        </div>
+    </header>
+    <main class="contenido">
+        <h2 class="titulo-grande">Inicio</h2>
+        <div class="regla ancho">
+            <p class="etiqueta">Sesión iniciada</p>
+            <dl class="datos">
+                <dt>Código</dt><dd th:text="${medico.idMedico()}">0</dd>
+                <dt>Nombre</dt><dd th:text="${medico.nom()}">Nombre</dd>
+                <dt>Especialidad</dt><dd th:text="${medico.especialidad()}">Especialidad</dd>
+            </dl>
+            <p class="detalle gris">Pantalla provisional: aquí se conectarán las demás vistas.</p>
+        </div>
+    </main>
+</body>
+</html>
