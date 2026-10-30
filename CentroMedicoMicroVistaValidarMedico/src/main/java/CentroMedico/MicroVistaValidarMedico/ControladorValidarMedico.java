@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,12 @@ public class ControladorValidarMedico {
     @Autowired
     private Servicio s;
 
+    @Value("${vista.secreto}")
+    private String secreto;
+
+    @Value("${vista.historial.url}")
+    private String urlHistorial;
+
     @GetMapping("/")
     public String raiz() {
         return "redirect:/ingreso";
@@ -29,8 +36,9 @@ public class ControladorValidarMedico {
     // ---------- Ingreso ----------
     @GetMapping("/ingreso")
     public String ingreso(HttpSession sesion) {
-        if (sesion.getAttribute(SESION) != null) {
-            return "redirect:/inicio";
+        Medico m = (Medico) sesion.getAttribute(SESION);
+        if (m != null) {
+            return "redirect:" + destino(m); // ya inició sesión: sigue a la siguiente vista
         }
         return "ingreso";
     }
@@ -59,7 +67,7 @@ public class ControladorValidarMedico {
             HttpSession sesion = request.getSession();
             request.changeSessionId(); // evita fijación de sesión
             sesion.setAttribute(SESION, m);
-            return "redirect:/inicio";
+            return "redirect:" + destino(m);
         } catch (RuntimeException ex) {
             model.addAttribute("error", mensaje(ex));
             return "ingreso";
@@ -117,21 +125,16 @@ public class ControladorValidarMedico {
         return "registro-listo";
     }
 
-    // ---------- Sesión iniciada (pantalla provisional hasta tener las demás vistas) ----------
-    @GetMapping("/inicio")
-    public String inicio(HttpSession sesion, Model model) {
-        Medico m = (Medico) sesion.getAttribute(SESION);
-        if (m == null) {
-            return "redirect:/ingreso";
-        }
-        model.addAttribute("medico", m);
-        return "inicio";
-    }
-
-    @PostMapping("/salir")
-    public String salir(HttpSession sesion) {
+    // ---------- Cierre de sesión (las demás vistas redirigen aquí al pulsar "Salir") ----------
+    @GetMapping("/cerrar")
+    public String cerrar(HttpSession sesion) {
         sesion.invalidate();
         return "redirect:/ingreso";
+    }
+
+    // URL de la siguiente vista con un pase firmado de 60 segundos.
+    private String destino(Medico m) {
+        return urlHistorial + "/entrar?t=" + TokenMedico.crear(m, secreto, 60);
     }
 
     // Traduce los errores del micro a un texto claro para la pantalla.

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Historial clínico · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body>
+    <header class="barra">
+        <span class="barra-marca">Centro Médico</span>
+        <div class="barra-usuario">
+            <span><span th:text="${medico.nom()}">Médico</span> · código <span th:text="${medico.idMedico()}">0</span></span>
+            <form th:action="@{/salir}" method="post">
+                <button type="submit" class="boton-chico">Salir</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="dos-columnas">
+
+        <!-- IZQUIERDA: registrar paciente (graba el paciente y crea su historial) -->
+        <section class="columna">
+            <p class="etiqueta">Paciente nuevo</p>
+            <h2>Registrar paciente</h2>
+
+            <div class="aviso" role="alert" th:if="${errorRegistro}" th:text="${errorRegistro}"></div>
+
+            <div class="regla" th:if="${idNuevo}">
+                <p class="etiqueta">Paciente registrado · código del historial</p>
+                <p class="codigo-grande" th:text="${idNuevo}">1</p>
+                <p class="detalle gris"><span th:text="${nombreNuevo}">Nombre</span> · DNI <span th:text="${dniNuevo}">00000000</span></p>
+                <p class="detalle gris">Anote este código: con él se consulta el historial.</p>
+                <p class="detalle gris" th:if="${nota}" th:text="${nota}">Nota</p>
+                <a class="boton" th:href="@{/(idHistorial=${idNuevo})}">Consultar este historial</a>
+            </div>
+
+            <form class="formpac" th:action="@{/paciente}" method="post" autocomplete="off">
+                <div class="fila-doble">
+                    <div class="campo mono">
+                        <label class="etiqueta" for="dni">DNI</label>
+                        <input id="dni" name="dni" type="text" inputmode="numeric" maxlength="8" th:value="${dni}" required autofocus>
+                    </div>
+                    <div class="campo mono">
+                        <label class="etiqueta" for="tel">Teléfono</label>
+                        <input id="tel" name="tel" type="text" inputmode="numeric" maxlength="9" th:value="${tel}" required>
+                    </div>
+                </div>
+                <div class="campo mono">
+                    <label class="etiqueta" for="nom">Nombres</label>
+                    <input id="nom" name="nom" type="text" maxlength="60" th:value="${nom}" required>
+                </div>
+                <div class="campo mono">
+                    <label class="etiqueta" for="ape">Apellidos</label>
+                    <input id="ape" name="ape" type="text" maxlength="60" th:value="${ape}" required>
+                </div>
+                <div class="campo mono">
+                    <label class="etiqueta" for="dir">Dirección</label>
+                    <input id="dir" name="dir" type="text" maxlength="120" th:value="${dir}" required>
+                </div>
+                <button class="boton serif" type="submit">Registrar paciente</button>
+            </form>
+        </section>
+
+        <!-- DERECHA: consultar el historial de un paciente ya registrado, por su código -->
+        <section class="columna">
+            <p class="etiqueta">Paciente ya registrado</p>
+            <h2>Consultar historial</h2>
+
+            <form class="busqueda" th:action="@{/}" method="get" autocomplete="off">
+                <div class="campo">
+                    <label class="etiqueta" for="idHistorial">Código de historial</label>
+                    <input id="idHistorial" name="idHistorial" type="text" inputmode="numeric"
+                           th:value="${idHistorial}" required>
+                </div>
+                <button class="boton fijo" type="submit">Consultar</button>
+            </form>
+            <p class="detalle gris">El código se genera al registrar al paciente.</p>
+
+            <div class="aviso" role="alert" th:if="${errorConsulta}" th:text="${errorConsulta}"></div>
+
+            <div class="regla" th:if="${historial}">
+                <p class="etiqueta">Historial encontrado</p>
+                <dl class="datos">
+                    <dt>Código</dt><dd th:text="${historial.idHistorial()}">0</dd>
+                    <dt>Creado el</dt><dd th:text="${historial.fecCreacion()}">2026-01-01</dd>
+                    <dt>DNI</dt><dd th:text="${historial.dniPaciente()}">00000000</dd>
+                    <th:block th:if="${paciente}">
+                        <dt>Paciente</dt><dd th:text="${paciente.nom() + ' ' + paciente.ape()}">Nombre</dd>
+                        <dt>Teléfono</dt><dd th:text="${paciente.tel()}">000000000</dd>
+                        <dt>Dirección</dt><dd th:text="${paciente.dir()}">Dirección</dd>
+                    </th:block>
+                </dl>
+                <a class="boton" th:href="@{/continuar(idHistorial=${historial.idHistorial()})}">Continuar con la cita médica</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
