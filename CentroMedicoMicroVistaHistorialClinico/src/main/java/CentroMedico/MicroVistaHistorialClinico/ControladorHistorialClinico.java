@@ -44,42 +44,44 @@ public class ControladorHistorialClinico {
         return "redirect:/";
     }
 
-    // Pantalla de dos columnas: izquierda registra pacientes, derecha consulta un historial por su código.
+    // Pantalla de dos columnas: izquierda registra pacientes, derecha consulta el historial por DNI.
     @GetMapping("/")
-    public String pantalla(@RequestParam(required = false) String idHistorial,
+    public String pantalla(@RequestParam(required = false) String dniConsulta,
                            HttpSession sesion, Model model) {
         Medico m = (Medico) sesion.getAttribute(SESION);
         if (m == null) {
             return "redirect:" + urlIngreso + "/ingreso";
         }
         model.addAttribute("medico", m);
-        if (idHistorial == null) {
+        if (dniConsulta == null) {
             return "historial";
         }
 
-        String codigo = idHistorial.trim();
-        model.addAttribute("idHistorial", codigo);
-        if (codigo.isEmpty()) {
-            model.addAttribute("errorConsulta", "Escriba el código del historial clínico");
+        String d = dniConsulta.trim();
+        model.addAttribute("dniConsulta", d);
+        if (d.isEmpty()) {
+            model.addAttribute("errorConsulta", "Escriba el DNI del paciente");
             return "historial";
         }
-        if (!codigo.matches("\\d{1,18}")) {
-            model.addAttribute("errorConsulta", "El código del historial es un número");
+        if (!d.matches("\\d{8}")) {
+            model.addAttribute("errorConsulta", "El DNI debe tener 8 dígitos");
             return "historial";
         }
 
         try {
-            // Del diagrama: consultarHistorial(idHistorial)
-            HistorialClinico h = s.consultar(Long.parseLong(codigo));
-            if (h == null) {
-                model.addAttribute("errorConsulta", "No existe un historial clínico con el código " + codigo);
-            } else {
+            // Del diagrama: consultarHistorial(dniPaciente)
+            HistorialClinico h = s.consultar(d);
+            if (h != null) {
                 model.addAttribute("historial", h);
                 try {
-                    model.addAttribute("paciente", s.buscarPaciente(h.dniPaciente()));
+                    model.addAttribute("paciente", s.buscarPaciente(d));
                 } catch (RuntimeException ignorada) {
                     // se muestra el historial aunque no se puedan traer los datos del paciente
                 }
+            } else if (s.buscarPaciente(d) != null) {
+                model.addAttribute("errorConsulta", "El paciente está registrado, pero todavía no tiene historial clínico");
+            } else {
+                model.addAttribute("errorConsulta", "No hay ningún paciente registrado con el DNI " + d);
             }
         } catch (RuntimeException ex) {
             model.addAttribute("errorConsulta", mensaje(ex));
@@ -124,9 +126,9 @@ public class ControladorHistorialClinico {
             } catch (HttpClientErrorException.Conflict ex) {
                 // El DNI ya estaba grabado: solo se sigue si todavía no tiene historial.
                 try {
-                    HistorialClinico previo = s.buscarPorDni(d);
+                    HistorialClinico previo = s.consultar(d);
                     if (previo != null) {
-                        error = "Ese paciente ya está registrado; su historial es el código " + previo.idHistorial();
+                        error = "Ese paciente ya está registrado. Consulte su historial con el DNI " + d;
                     } else {
                         nota = "El DNI ya estaba grabado; se creó su historial.";
                     }
@@ -138,14 +140,13 @@ public class ControladorHistorialClinico {
             }
         }
 
-        // Paso 2: su historial.
+        // Paso 2: su historial (se crea por detrás; no se muestra su código).
         if (error == null) {
             try {
                 HistorialClinico h = s.crearHistorial(d);
                 if (h != null && h.idHistorial() != null) {
-                    ra.addFlashAttribute("idNuevo", h.idHistorial());
-                    ra.addFlashAttribute("dniNuevo", d);
-                    ra.addFlashAttribute("nombreNuevo", n + " " + a);
+                    ra.addFlashAttribute("registrado", n + " " + a);
+                    ra.addFlashAttribute("dniRegistrado", d);
                     if (nota != null) {
                         ra.addFlashAttribute("nota", nota);
                     }
@@ -168,17 +169,18 @@ public class ControladorHistorialClinico {
     }
 
     // Pasa a la vista de cita médica con un pase NUEVO (el de la llegada ya pudo vencer).
+    // Lleva el DNI del paciente: con él se identifica su historial.
     @GetMapping("/continuar")
-    public String continuar(@RequestParam(defaultValue = "") String idHistorial, HttpSession sesion) {
+    public String continuar(@RequestParam(defaultValue = "") String dni, HttpSession sesion) {
         Medico m = (Medico) sesion.getAttribute(SESION);
         if (m == null) {
             return "redirect:" + urlIngreso + "/ingreso";
         }
-        if (!idHistorial.matches("\\d{1,18}")) {
+        if (!dni.matches("\\d{8}")) {
             return "redirect:/";
         }
         return "redirect:" + urlCita + "/entrar?t=" + TokenMedico.crear(m, secreto, 60)
-                + "&idHistorial=" + idHistorial;
+                + "&dni=" + dni;
     }
 
     // Cierra esta sesión y la del login.
