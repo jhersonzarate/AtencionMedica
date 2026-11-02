@@ -27,10 +27,8 @@ public class Servicio {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Faltan datos: historialClinico, medico, citaMedica y atencionMedica son obligatorios");
         }
-        String dni = e.historialClinico().dniPaciente();
-        if (dni == null || !dni.matches("\\d{8}") || e.citaMedica().idCita() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Indique el DNI del paciente (8 dígitos) y el idCita");
+        if (e.historialClinico().idHistorial() == null || e.citaMedica().idCita() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Indique el idHistorial y el idCita");
         }
 
         // 1. MicroValidarMedico: el médico debe ser válido
@@ -40,11 +38,12 @@ public class Servicio {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Médico no válido");
         }
 
-        // 2. MicroHistorialClinico: el paciente debe tener historial (consulta por DNI)
-        HistorialClinico h = rt.getForObject(HISTORIAL + "/consultar/" + dni, HistorialClinico.class);
+        // 2. MicroHistorialClinico: el historial debe existir
+        HistorialClinico h = rt.getForObject(HISTORIAL + "/consultar/" + e.historialClinico().idHistorial(),
+                HistorialClinico.class);
         if (h == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No existe historial clínico para el DNI " + dni);
+                    "No existe el historial " + e.historialClinico().idHistorial());
         }
 
         // 3. MicroCitaMedica: la cita debe existir y estar pendiente

@@ -17,13 +17,9 @@ public class Servicio {
     @Autowired
     private RepositorioPaciente rp;
 
-    // Del diagrama: consultarHistorial(dniPaciente: String): HistorialClinico
-    // Devuelve null si el paciente todavía no tiene historial.
-    public HistorialClinico consultarHistorial(String dniPaciente) {
-        if (dniPaciente == null || !dniPaciente.matches("\\d{8}")) {
-            throw malo("El DNI del paciente debe tener 8 dígitos");
-        }
-        return r.findFirstByDniPaciente(dniPaciente).orElse(null);
+    // Del diagrama
+    public HistorialClinico consultarHistorial(Long idHistorial) {
+        return r.findById(idHistorial).orElse(null);
     }
 
     // Apoyo de pruebas: el paciente debe existir antes de crear su historial.

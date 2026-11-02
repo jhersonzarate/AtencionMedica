@@ -10,10 +10,9 @@ public class ApiHistorialClinico {
     @Autowired
     private Servicio s;
 
-    // Del diagrama: consultarHistorial(dniPaciente)
-    @GetMapping("/consultar/{dniPaciente}")
-    public HistorialClinico consultarHistorial(@PathVariable String dniPaciente) {
-        return s.consultarHistorial(dniPaciente);
+    @GetMapping("/consultar/{idHistorial}")
+    public HistorialClinico consultarHistorial(@PathVariable Long idHistorial) {
+        return s.consultarHistorial(idHistorial);
     }
 
     @PostMapping("/grabar")
@@ -22,7 +21,7 @@ public class ApiHistorialClinico {
     @GetMapping("/listar")
     public List<HistorialClinico> listar() { return s.listar(); }
 
-    // Paciente: solo grabar y listar (sus datos se ven al consultar el historial por DNI).
+    // Paciente: solo grabar y listar (no se busca; se consulta por el historial).
     @PostMapping("/paciente/grabar")
     public Paciente grabarPaciente(@RequestBody Paciente p) { return s.grabarPaciente(p); }
 
