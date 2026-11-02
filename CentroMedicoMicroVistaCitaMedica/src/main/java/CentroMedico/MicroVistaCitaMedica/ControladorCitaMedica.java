@@ -35,8 +35,8 @@ public class ControladorCitaMedica {
     @Value("${vista.historial.url}")
     private String urlHistorial;
 
-    @Value("${vista.atencion.url}")
-    private String urlAtencion;
+    @Value("${vista.receta.url}")
+    private String urlReceta;
 
     // Llegada desde la vista de historial clínico: pase firmado + código del historial elegido.
     // Crea la sesión de ESTA app, guarda el historial y limpia la URL.
@@ -144,8 +144,8 @@ public class ControladorCitaMedica {
         return "redirect:/";
     }
 
-    // Pasa a la vista de atención médica con un pase NUEVO. Solo una cita pendiente puede atenderse:
-    // se vuelve a consultar aquí porque su estado pudo cambiar desde que se mostró.
+    // Pasa a la vista de la receta (MicroVistaCarritoReceta) con un pase NUEVO. Solo una cita
+    // pendiente puede seguir: se vuelve a consultar aquí porque su estado pudo cambiar.
     @GetMapping("/continuar")
     public String continuar(@RequestParam(defaultValue = "") String idCita, HttpSession sesion) {
         Medico m = (Medico) sesion.getAttribute(SESION);
@@ -167,7 +167,7 @@ public class ControladorCitaMedica {
         } catch (RuntimeException ex) {
             return "redirect:/?idCita=" + idCita; // la pantalla muestra el error del servicio
         }
-        return "redirect:" + urlAtencion + "/entrar?t=" + TokenMedico.crear(m, secreto, 60)
+        return "redirect:" + urlReceta + "/entrar?t=" + TokenMedico.crear(m, secreto, 60)
                 + "&idHistorial=" + historial + "&idCita=" + idCita;
     }
 

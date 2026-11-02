@@ -76,7 +76,7 @@
                               th:text="${atendida} ? 'Atendida' : 'Pendiente'">Pendiente</span></dd>
                 </dl>
                 <a class="boton" th:if="${!atendida}"
-                   th:href="@{/continuar(idCita=${cita.idCita()})}">Continuar con la atención médica</a>
+                   th:href="@{/continuar(idCita=${cita.idCita()})}">Continuar con la receta</a>
                 <p class="detalle gris" th:if="${atendida}">Esta cita ya fue atendida. Registre una cita nueva para continuar.</p>
             </div>
         </section>
