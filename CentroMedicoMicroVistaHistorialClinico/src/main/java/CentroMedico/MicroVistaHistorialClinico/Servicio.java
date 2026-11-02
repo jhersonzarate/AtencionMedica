@@ -12,9 +12,14 @@ public class Servicio {
     @Autowired
     private RestTemplate rt;
 
-    // Del diagrama: consultarHistorial(dniPaciente). Devuelve null si el paciente no tiene historial (200 vacío).
-    public HistorialClinico consultar(String dniPaciente) {
-        return rt.getForObject(HISTORIAL + "/consultar/{dni}", HistorialClinico.class, dniPaciente);
+    // Del diagrama: devuelve el historial, o null si no existe (el backend responde 200 vacío).
+    public HistorialClinico consultar(Long idHistorial) {
+        return rt.getForObject(HISTORIAL + "/consultar/{id}", HistorialClinico.class, idHistorial);
+    }
+
+    public List<HistorialClinico> listarHistoriales() {
+        HistorialClinico[] v = rt.getForObject(HISTORIAL + "/listar", HistorialClinico[].class);
+        return v == null ? List.of() : List.of(v);
     }
 
     public List<Paciente> listarPacientes() {
@@ -37,6 +42,16 @@ public class Servicio {
         for (Paciente p : listarPacientes()) {
             if (dni != null && dni.equals(p.dni())) {
                 return p;
+            }
+        }
+        return null;
+    }
+
+    // Historial de un paciente según su DNI, o null si todavía no tiene.
+    public HistorialClinico buscarPorDni(String dni) {
+        for (HistorialClinico h : listarHistoriales()) {
+            if (dni.equals(h.dniPaciente())) {
+                return h;
             }
         }
         return null;
