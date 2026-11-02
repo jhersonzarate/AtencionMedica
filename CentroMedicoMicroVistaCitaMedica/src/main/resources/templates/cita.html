@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cita médica · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body>
+    <header class="barra">
+        <span class="barra-marca">Centro Médico</span>
+        <div class="barra-usuario">
+            <span><span th:text="${medico.nom()}">Médico</span> · código <span th:text="${medico.idMedico()}">0</span></span>
+            <form th:action="@{/salir}" method="post">
+                <button type="submit" class="boton-chico">Salir</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Historial clínico con el que se está trabajando (viene de la vista anterior) -->
+    <div class="contexto">
+        <span>Historial clínico · código <span class="codigo" th:text="${historialActual}">1</span></span>
+        <a th:href="@{/historial}">Cambiar de historial</a>
+    </div>
+
+    <main class="dos-columnas">
+
+        <!-- IZQUIERDA: registrar una cita (queda pendiente) -->
+        <section class="columna">
+            <p class="etiqueta">Cita nueva</p>
+            <h2>Registrar cita</h2>
+
+            <div class="aviso" role="alert" th:if="${errorRegistro}" th:text="${errorRegistro}"></div>
+
+            <form class="formpac" th:action="@{/cita}" method="post" autocomplete="off">
+                <div class="campo mono">
+                    <label class="etiqueta" for="fec">Fecha de la cita</label>
+                    <input id="fec" name="fec" type="date" th:value="${fec} ?: ${hoy}" th:min="${hoy}" required autofocus>
+                </div>
+                <div class="campo mono">
+                    <label class="etiqueta" for="motivo">Motivo de la consulta</label>
+                    <input id="motivo" name="motivo" type="text" minlength="3" maxlength="120" th:value="${motivo}" required>
+                </div>
+                <button class="boton serif" type="submit">Registrar cita</button>
+            </form>
+        </section>
+
+        <!-- DERECHA: consultar una cita ya registrada, por su código -->
+        <section class="columna">
+            <p class="etiqueta">Cita ya registrada</p>
+            <h2>Consultar cita</h2>
+
+            <form class="busqueda" th:action="@{/}" method="get" autocomplete="off">
+                <div class="campo">
+                    <label class="etiqueta" for="idCita">Código de cita</label>
+                    <input id="idCita" name="idCita" type="text" inputmode="numeric"
+                           th:value="${idCita}" required>
+                </div>
+                <button class="boton fijo" type="submit">Consultar</button>
+            </form>
+            <p class="detalle gris">El código se genera al registrar la cita.</p>
+
+            <div class="aviso" role="alert" th:if="${errorConsulta}" th:text="${errorConsulta}"></div>
+
+            <div class="regla" th:if="${cita}">
+                <p class="etiqueta">Cita encontrada</p>
+                <dl class="datos">
+                    <dt>Código</dt><dd th:text="${cita.idCita()}">0</dd>
+                    <dt>Fecha</dt><dd th:text="${cita.fec()}">2026-01-01</dd>
+                    <dt>Motivo</dt><dd th:text="${cita.motivo()}">Motivo</dd>
+                    <dt>Estado</dt>
+                    <dd><span class="estado" th:classappend="${atendida} ? 'atendida'"
+                              th:text="${atendida} ? 'Atendida' : 'Pendiente'">Pendiente</span></dd>
+                </dl>
+                <a class="boton" th:if="${!atendida}"
+                   th:href="@{/continuar(idCita=${cita.idCita()})}">Continuar con la atención médica</a>
+                <p class="detalle gris" th:if="${atendida}">Esta cita ya fue atendida. Registre una cita nueva para continuar.</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
