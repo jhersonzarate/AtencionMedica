@@ -16,6 +16,9 @@ public class ApiRecetaCompuesto {
     @GetMapping("/medicamentos")
     public List<Medicamento> listarMedicamentos() { return s.listarMedicamentos(); }
 
+    @PostMapping("/grabarmedicamento")
+    public Medicamento grabarMedicamento(@RequestBody Medicamento m) { return s.grabarMedicamento(m); }
+
     @PostMapping("/agregar")
     public void agregarMedicamento(@RequestBody EntradaReceta e) { s.agregarMedicamento(e); }
 

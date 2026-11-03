@@ -28,6 +28,16 @@ public class Servicio {
         return r == null ? new ArrayList<>() : Arrays.asList(r);
     }
 
+    // Registra un medicamento nuevo en el catálogo (el catálogo valida nombre, precio y stock).
+    // Siempre se envía sin id, para que sea una creación y nunca una actualización.
+    public Medicamento grabarMedicamento(Medicamento m) {
+        if (m == null) {
+            throw malo("Faltan los datos del medicamento");
+        }
+        return rt.postForObject(CATALOGO + "/grabar",
+                new Medicamento(null, m.nom(), m.pre(), m.stock()), Medicamento.class);
+    }
+
     // Descuenta el stock en el catálogo y agrega la línea a la cesta.
     public void agregarMedicamento(EntradaReceta e) {
         if (e == null || e.idMedicamento() == null || e.cant() < 1) {
