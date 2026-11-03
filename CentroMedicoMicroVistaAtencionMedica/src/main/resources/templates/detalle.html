@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Atención registrada · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body>
+    <header class="barra">
+        <span class="barra-marca">Centro Médico</span>
+        <div class="barra-usuario">
+            <span><span th:text="${medico.nom()}">Médico</span> · código <span th:text="${medico.idMedico()}">0</span></span>
+            <form th:action="@{/salir}" method="post">
+                <button type="submit" class="boton-chico">Salir</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="dos-columnas">
+
+        <!-- IZQUIERDA: la atención -->
+        <section class="columna">
+            <p class="etiqueta">Atención registrada</p>
+            <h2>Detalle de la atención</h2>
+
+            <div class="aviso" role="alert" th:if="${errorDetalle}" th:text="${errorDetalle}"></div>
+
+            <div th:if="${atencion}">
+                <div class="aviso ok" role="status">La atención quedó registrada y la cita pasó a atendida.</div>
+                <p class="etiqueta">Código de atención</p>
+                <p class="codigo-grande" th:text="${atencion.idAtencion()}">1</p>
+                <dl class="datos">
+                    <dt>Fecha</dt><dd th:text="${atencion.fec()}">2026-11-05</dd>
+                    <dt>Diagnóstico</dt><dd><p class="texto-largo" th:text="${atencion.diagnostico()}">Diagnóstico</p></dd>
+                    <dt>Tratamiento</dt><dd><p class="texto-largo" th:text="${atencion.tratamiento()}">Tratamiento</p></dd>
+                </dl>
+            </div>
+
+            <div class="acciones">
+                <a class="boton" th:href="@{/historial}">Atender otro paciente</a>
+            </div>
+        </section>
+
+        <!-- DERECHA: receta y análisis que quedaron con la atención -->
+        <section class="columna" th:if="${atencion}">
+            <p class="etiqueta">Quedó registrado con</p>
+            <h2>Receta y análisis</h2>
+
+            <p class="subtitulo">Receta</p>
+            <p class="detalle gris" th:if="${#lists.isEmpty(lineasReceta)}">Sin receta.</p>
+            <table class="tabla" th:if="${!#lists.isEmpty(lineasReceta)}">
+                <thead>
+                    <tr>
+                        <th>Medicamento</th>
+                        <th class="num">Cant.</th>
+                        <th class="num">Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="l : ${lineasReceta}">
+                        <td>
+                            <span th:text="${l.nom()}">Paracetamol</span>
+                            <span class="indicacion" th:text="${l.indicacion()}">Indicación</span>
+                        </td>
+                        <td class="num" th:text="${l.cant()}">1</td>
+                        <td class="num" th:text="${#numbers.formatDecimal(l.importe(), 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="total">
+                <span>Total receta</span>
+                <span class="monto" th:text="'S/ ' + ${#numbers.formatDecimal(totalReceta, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span>
+            </div>
+
+            <p class="subtitulo">Análisis</p>
+            <p class="detalle gris" th:if="${#lists.isEmpty(lineasAnalisis)}">Sin análisis.</p>
+            <table class="tabla" th:if="${!#lists.isEmpty(lineasAnalisis)}">
+                <thead>
+                    <tr>
+                        <th>Análisis</th>
+                        <th class="num">Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="l : ${lineasAnalisis}">
+                        <td>
+                            <span th:text="${l.nom()}">Hemograma completo</span>
+                            <span class="indicacion" th:text="${l.indicacion()}">Indicación</span>
+                        </td>
+                        <td class="num" th:text="${#numbers.formatDecimal(l.importe(), 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="total">
+                <span>Total análisis</span>
+                <span class="monto" th:text="'S/ ' + ${#numbers.formatDecimal(totalAnalisis, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span>
+            </div>
+
+            <div class="total">
+                <span>Total general</span>
+                <span class="monto" th:text="'S/ ' + ${#numbers.formatDecimal(totalGeneral, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span>
+            </div>
+        </section>
+
+        <section class="columna" th:unless="${atencion}"></section>
+    </main>
+</body>
+</html>

@@ -14,6 +14,11 @@ public class ApiAtencionMedicaCompuesto {
         return s.registrarAtencion(e);
     }
 
+    @GetMapping("/previa")
+    public SalidaAtencionMedica verPrevia() {
+        return s.verPrevia();
+    }
+
     @GetMapping("/detalle")
     public SalidaAtencionMedica obtenerDetalleAtencion() {
         return s.obtenerDetalleAtencion();

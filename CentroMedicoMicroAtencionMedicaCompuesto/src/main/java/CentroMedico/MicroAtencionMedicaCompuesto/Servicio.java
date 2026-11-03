@@ -74,6 +74,14 @@ public class Servicio {
         return salida;
     }
 
+    // Lo que hay hoy en las cestas, sin registrar nada: el médico lo revisa antes de firmar.
+    // La atención va en null porque todavía no existe.
+    public SalidaAtencionMedica verPrevia() {
+        SalidaReceta receta = rt.getForObject(RECETA + "/resumen", SalidaReceta.class);
+        SalidaAnalisis analisis = rt.getForObject(ANALISIS + "/resumen", SalidaAnalisis.class);
+        return new SalidaAtencionMedica(null, receta, analisis);
+    }
+
     // Detalle de la última atención registrada.
     public SalidaAtencionMedica obtenerDetalleAtencion() {
         SalidaAtencionMedica u = ultima;
