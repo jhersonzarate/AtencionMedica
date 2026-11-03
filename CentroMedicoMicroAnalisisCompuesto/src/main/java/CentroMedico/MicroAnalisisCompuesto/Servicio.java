@@ -27,6 +27,16 @@ public class Servicio {
         return r == null ? new ArrayList<>() : Arrays.asList(r);
     }
 
+    // Registra un tipo de análisis nuevo en el catálogo (el catálogo valida nombre y precio).
+    // Siempre se envía sin id, para que sea una creación y nunca una actualización.
+    public TipoAnalisis grabarTipoAnalisis(TipoAnalisis t) {
+        if (t == null) {
+            throw malo("Faltan los datos del tipo de análisis");
+        }
+        return rt.postForObject(CATALOGO + "/grabar",
+                new TipoAnalisis(null, t.nom(), t.pre()), TipoAnalisis.class);
+    }
+
     // Un análisis se solicita una sola vez: no hay cantidad.
     public void agregarTipoAnalisis(EntradaAnalisis e) {
         if (e == null || e.idTipoAnalisis() == null) {

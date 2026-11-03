@@ -16,6 +16,9 @@ public class ApiAnalisisCompuesto {
     @GetMapping("/tipos")
     public List<TipoAnalisis> listarTiposAnalisis() { return s.listarTiposAnalisis(); }
 
+    @PostMapping("/grabartipo")
+    public TipoAnalisis grabarTipoAnalisis(@RequestBody TipoAnalisis t) { return s.grabarTipoAnalisis(t); }
+
     @PostMapping("/agregar")
     public void agregarTipoAnalisis(@RequestBody EntradaAnalisis e) { s.agregarTipoAnalisis(e); }
 

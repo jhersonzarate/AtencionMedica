@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Análisis · Centro Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Source+Serif+4:wght@600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body>
+    <header class="barra">
+        <span class="barra-marca">Centro Médico</span>
+        <div class="barra-usuario">
+            <span><span th:text="${medico.nom()}">Médico</span> · código <span th:text="${medico.idMedico()}">0</span></span>
+            <form th:action="@{/salir}" method="post">
+                <button type="submit" class="boton-chico">Salir</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Historial y cita con los que se trabaja -->
+    <div class="contexto">
+        <span>Historial clínico · código <span class="codigo" th:text="${historialActual}">1</span>
+            &nbsp;·&nbsp; Cita · código <span class="codigo" th:text="${citaActual}">1</span></span>
+        <a th:href="@{/receta}">Volver a la receta</a>
+    </div>
+
+    <main class="dos-columnas">
+
+        <!-- IZQUIERDA: agregar al pedido y registrar tipos de análisis nuevos -->
+        <section class="columna">
+            <div class="bloque">
+                <p class="etiqueta">Tipo de análisis del catálogo</p>
+                <h2>Agregar al pedido</h2>
+
+                <div class="aviso" role="alert" th:if="${errorServicio}" th:text="${errorServicio}"></div>
+                <div class="aviso" role="alert" th:if="${errorAgregar}" th:text="${errorAgregar}"></div>
+
+                <p class="detalle gris" th:if="${llena}"
+                   th:text="'El pedido ya tiene el máximo de ' + ${maxLineas} + ' análisis.'">Pedido lleno.</p>
+
+                <p class="detalle gris" th:if="${!llena and #lists.isEmpty(catalogo) and errorServicio == null}">
+                    El catálogo está vacío. Registre un tipo de análisis abajo.</p>
+
+                <form class="formpac" th:action="@{/agregar}" method="post" autocomplete="off"
+                      th:if="${!llena and !#lists.isEmpty(catalogo)}">
+                    <div class="campo mono">
+                        <label class="etiqueta" for="idTipoAnalisis">Tipo de análisis</label>
+                        <select id="idTipoAnalisis" name="idTipoAnalisis" required autofocus>
+                            <option value="">Elija un tipo de análisis</option>
+                            <option th:each="x : ${catalogo}" th:value="${x.idTipoAnalisis()}"
+                                    th:selected="${x.idTipoAnalisis().toString() == tipoSel}"
+                                    th:disabled="${enPedido.contains(x.nom().toLowerCase())}"
+                                    th:text="${x.nom() + ' · S/ ' + #numbers.formatDecimal(x.pre(), 1, 'COMMA', 2, 'POINT') + (enPedido.contains(x.nom().toLowerCase()) ? ' · ya en el pedido' : '')}">Hemograma completo</option>
+                        </select>
+                    </div>
+                    <div class="campo mono">
+                        <label class="etiqueta" for="indicacion">Indicación</label>
+                        <input id="indicacion" name="indicacion" type="text" minlength="3" maxlength="120"
+                               th:value="${indicacion}" required>
+                    </div>
+                    <button class="boton serif" type="submit">Agregar al pedido</button>
+                </form>
+            </div>
+
+            <div class="bloque">
+                <p class="etiqueta">Catálogo</p>
+                <h2>Registrar tipo de análisis</h2>
+
+                <div class="aviso ok" role="status" th:if="${okTipo}" th:text="${okTipo}"></div>
+                <div class="aviso" role="alert" th:if="${errorTipo}" th:text="${errorTipo}"></div>
+
+                <form class="formpac" th:action="@{/tipo}" method="post" autocomplete="off">
+                    <div class="campo mono">
+                        <label class="etiqueta" for="nom">Nombre</label>
+                        <input id="nom" name="nom" type="text" minlength="2" maxlength="80"
+                               th:value="${nom}" required>
+                    </div>
+                    <div class="campo mono">
+                        <label class="etiqueta" for="pre">Precio (S/)</label>
+                        <input id="pre" name="pre" type="number" min="0.01" max="99999.99" step="0.01"
+                               th:value="${pre}" required>
+                    </div>
+                    <button class="boton serif" type="submit">Registrar tipo de análisis</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- DERECHA: el pedido actual -->
+        <section class="columna">
+            <p class="etiqueta">Pedido</p>
+            <h2>Pedido de análisis</h2>
+
+            <div class="aviso" role="alert" th:if="${errorPedido}" th:text="${errorPedido}"></div>
+
+            <p class="detalle gris" th:if="${#lists.isEmpty(lineas)}">
+                El pedido aún no tiene análisis. Puede continuar sin análisis.</p>
+
+            <table class="tabla" th:if="${!#lists.isEmpty(lineas)}">
+                <thead>
+                    <tr>
+                        <th>Análisis</th>
+                        <th class="num">Precio</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="l : ${lineas}">
+                        <td>
+                            <span th:text="${l.nom()}">Hemograma completo</span>
+                            <span class="indicacion" th:text="${l.indicacion()}">Indicación</span>
+                        </td>
+                        <td class="num" th:text="${#numbers.formatDecimal(l.importe(), 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                        <td>
+                            <form th:action="@{/quitar}" method="post">
+                                <input type="hidden" name="idLin" th:value="${l.idLin()}">
+                                <button type="submit" class="boton-chico">Quitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="detalle gris" th:if="${!#lists.isEmpty(lineas)}"
+               th:text="${lineas.size()} + ' de ' + ${maxLineas} + ' análisis'">1 de 10 análisis</p>
+
+            <div class="total">
+                <span>Total</span>
+                <span class="monto" th:text="'S/ ' + ${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span>
+            </div>
+
+            <div class="accion">
+                <a class="boton" th:href="@{/continuar}">Continuar con la atención</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
