@@ -31,8 +31,6 @@
 
             <div th:if="${atencion}">
                 <div class="aviso ok" role="status">La atención quedó registrada y la cita pasó a atendida.</div>
-                <p class="etiqueta">Código de atención</p>
-                <p class="codigo-grande" th:text="${atencion.idAtencion()}">1</p>
                 <dl class="datos">
                     <dt>Fecha</dt><dd th:text="${atencion.fec()}">2026-11-05</dd>
                     <dt>Diagnóstico</dt><dd><p class="texto-largo" th:text="${atencion.diagnostico()}">Diagnóstico</p></dd>

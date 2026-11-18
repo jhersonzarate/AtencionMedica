@@ -29,15 +29,6 @@
 
             <div class="aviso" role="alert" th:if="${errorRegistro}" th:text="${errorRegistro}"></div>
 
-            <div class="regla" th:if="${idNuevo}">
-                <p class="etiqueta">Paciente registrado · código del historial</p>
-                <p class="codigo-grande" th:text="${idNuevo}">1</p>
-                <p class="detalle gris"><span th:text="${nombreNuevo}">Nombre</span> · DNI <span th:text="${dniNuevo}">00000000</span></p>
-                <p class="detalle gris">Anote este código: con él se consulta el historial.</p>
-                <p class="detalle gris" th:if="${nota}" th:text="${nota}">Nota</p>
-                <a class="boton" th:href="@{/(idHistorial=${idNuevo})}">Consultar este historial</a>
-            </div>
-
             <form class="formpac" th:action="@{/paciente}" method="post" autocomplete="off">
                 <div class="fila-doble">
                     <div class="campo mono">
